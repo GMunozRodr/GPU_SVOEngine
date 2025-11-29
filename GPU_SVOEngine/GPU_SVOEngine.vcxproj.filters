@@ -33,9 +33,6 @@
     <ClCompile Include="src\Octree\voxelizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Octree\octree_nodes.hpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Octree\octree_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vendor\stb\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Octree\octree_nodes.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

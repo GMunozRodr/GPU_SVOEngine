@@ -50,7 +50,7 @@ private:
 	uint32_t m_intersectColorPipelineID = UINT32_MAX;
     uint32_t m_pipelineLayoutID = UINT32_MAX;
 	std::vector<uint32_t> m_framebuffers{};
-	uint32_t m_renderFinishedSemaphoreID = UINT32_MAX;
+	std::vector<uint32_t> m_renderFinishedSemaphoreIDs{};
 	uint32_t m_inFlightFenceID = UINT32_MAX;
 
 	uint32_t m_octreeBuffer = UINT32_MAX;

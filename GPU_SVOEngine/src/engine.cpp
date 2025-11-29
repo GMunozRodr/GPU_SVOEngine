@@ -68,7 +68,7 @@ Engine::Engine(const uint32_t samplerImageCount, const uint8_t depth) : cam({ 0,
 #ifndef _DEBUG
     VulkanContext::init(VK_API_VERSION_1_3, false, false, m_window.getRequiredVulkanExtensions());
 #else
-    VulkanContext::init(VK_API_VERSION_1_3, true, false, m_window.getRequiredVulkanExtensions());
+    VulkanContext::init(VK_API_VERSION_1_3, true, true, m_window.getRequiredVulkanExtensions());
 #endif
     // Vulkan Surface
     m_window.createSurface(VulkanContext::getHandle());
@@ -117,11 +117,14 @@ Engine::Engine(const uint32_t samplerImageCount, const uint8_t depth) : cam({ 0,
 
     // Framebuffers
     m_framebuffers.resize(swapchain.getImageCount());
+    m_renderFinishedSemaphoreIDs.resize(swapchain.getImageCount());
     for (uint32_t i = 0; i < swapchain.getImageCount(); i++)
+    {
         m_framebuffers[i] = createFramebuffer(swapchain.getImageView(i), swapchain.getExtent());
+        m_renderFinishedSemaphoreIDs[i] = device.createSemaphore();
+    }
 
     // Create sync objects
-    m_renderFinishedSemaphoreID = device.createSemaphore();
     m_inFlightFenceID = device.createFence(true);
 
     {
@@ -379,13 +382,13 @@ void Engine::run()
         recordCommandBuffer(m_framebuffers[nextImage], imguiDrawData);
 
         // Submit
-        graphicsBuffer.submit(graphicsQueue, { {swapchain.getImgSemaphore(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT} }, { m_renderFinishedSemaphoreID }, m_inFlightFenceID);
+        graphicsBuffer.submit(graphicsQueue, { {swapchain.getImgSemaphore(), VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT} }, { m_renderFinishedSemaphoreIDs[nextImage] }, m_inFlightFenceID);
 
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
 
         // Present
-        swapchain.present(m_presentQueuePos, {      });
+        swapchain.present(m_presentQueuePos, {m_renderFinishedSemaphoreIDs[nextImage]});
 
         frameCounter++;
     }

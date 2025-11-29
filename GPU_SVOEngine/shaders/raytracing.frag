@@ -1,6 +1,7 @@
 #version 450
 
 #extension GL_KHR_vulkan_glsl : enable
+#extension GL_EXT_nonuniform_qualifier : enable
 
 layout ( push_constant ) uniform PushConstants {
 	vec3 camPos;
@@ -29,11 +30,11 @@ struct Material {
     uint specularMap;
 };
 
-layout(set = 0, binding = 0) buffer OctreeData {
+layout(set = 0, binding = 0) readonly buffer OctreeData {
   uint octree[];
 };
 
-layout(set = 0, binding = 1) buffer MaterialData {
+layout(set = 0, binding = 1) readonly buffer MaterialData {
   Material materials[];
 };
 
@@ -210,7 +211,8 @@ Collision traceRay(inout Ray ray, uint octant)
         if ((parent.leafMask & (1 << current)) != 0)
         {
             LeafNode voxel = parseLeaf(octree[nextChild], octree[nextChild + 1]);
-            if (materials[voxel.material].diffuseMap < SAMPLER_ARRAY_SIZE && texture(tex[materials[voxel.material].diffuseMap], voxel.uv).a >= 0.1)
+            uint diffIdx = materials[voxel.material].diffuseMap;
+            if (diffIdx < SAMPLER_ARRAY_SIZE && texture(tex[nonuniformEXT(diffIdx)], voxel.uv).a >= 0.1)
                 return Collision(true, nextChild, pos + vec3(size) / 2.0);
             stack[stackPtr].childCount++;
             continue;
@@ -261,8 +263,9 @@ vec3 calculateLighting(Collision coll)
     Material mat = materials[voxel.material];
 
     vec3 diffAmbTexel = vec3(1.0);
-    if (mat.diffuseMap < SAMPLER_ARRAY_SIZE) 
-        diffAmbTexel = texture(tex[mat.diffuseMap], voxel.uv).rgb;
+    uint diffIdx = mat.diffuseMap;
+    if (diffIdx < SAMPLER_ARRAY_SIZE)
+        diffAmbTexel = texture(tex[nonuniformEXT(diffIdx)], voxel.uv).rgb;
     vec3 ambientColor = mat.ambient * diffAmbTexel;
     
     float amb = 0.1;
@@ -283,8 +286,9 @@ vec3 calculateLighting(Collision coll)
     vec3 norm_camDir = normalize(camPos - coll.voxelPos);
     vec3 halfV = normalize(norm_sunDirection + norm_camDir);
     float specularTexel = 1.0;
-    if (mat.specularMap < SAMPLER_ARRAY_SIZE) 
-        specularTexel = texture(tex[mat.specularMap], voxel.uv).r;
+    uint specIdx = mat.specularMap;
+    if (specIdx < SAMPLER_ARRAY_SIZE)
+        specularTexel = texture(tex[nonuniformEXT(specIdx)], voxel.uv).r;
 
     vec3 diffuseColor = mat.diffuse * diffAmbTexel;
     vec3 specularColor = mat.specular * specularTexel;
