@@ -96,7 +96,9 @@ bool saveFlag = false;
 
 Truth is I am quite happy with the result. I may add some small things here and there but I doubt there will be any major changes to the project.
 
-## Known Issues
+## Known Issues (2025)
+I bought an AMD card, which allowed me to test this project in it. I found some bugs that I was not happy with so I decided to change them. Some known problems however still are present.
+
 - In order to avoid artifacts in AMD cards, GL_EXT_nonuniform_qualifier is enabled. The code on the CPU side should enable this feature (VkPhysicalDeviceVulkan12Features::shaderSampledImageArrayNonUniformIndexing) but due to limitations on VkPlayground it is not trivial to do this. VkPlayground is now a deprecated library that I am no longer updating, so I don't want to add a fix. Even if I decided to do it, this repository's submodule is 32 commits behind origin, among other changes this includes a complete redesign of the shader system with a migration to SLang and a redesign of the transfer system. These two changes alone means if I updated to apply last fixes I would have to refactor everything to account for the new systems. Besides, VkPlayground was made with Vulkan 1.0 usage in mind, since that is what I was learning back then, I would have to change quite a lot of things to allow for 1.2 features to be set, and I don't want to put that much work into a library I have decided to leave behind.
 - In the same line as the previous issue, there is an incorrect default value when creating command buffer pools that don't allow for individual command buffers to be reset. Due to the poor design of the library fixing this without changing the library is a bit annoying and I don't even remember how it was supposed to work now that I don't use it anymore (note to self: Make documentation for your libraries). Again, I don't want to change the library for the already mentioned reasons, so this error will not go away. I could have also just reset command pools instead of buffers but give me some slack, this code was made when I was still learning. 
 
