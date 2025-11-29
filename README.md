@@ -96,6 +96,12 @@ bool saveFlag = false;
 
 Truth is I am quite happy with the result. I may add some small things here and there but I doubt there will be any major changes to the project.
 
+## Known Issues
+- In order to avoid artifacts in AMD cards, GL_EXT_nonuniform_qualifier is enabled. The code on the CPU side should enable this feature (VkPhysicalDeviceVulkan12Features::shaderSampledImageArrayNonUniformIndexing) but due to limitations on VkPlayground it is not trivial to do this. VkPlayground is now a deprecated library that I am no longer updating, so I don't want to add a fix. Even if I decided to do it, this repository's submodule is 32 commits behind origin, among other changes this includes a complete redesign of the shader system with a migration to SLang and a redesign of the transfer system. These two changes alone means if I updated to apply last fixes I would have to refactor everything to account for the new systems. Besides, VkPlayground was made with Vulkan 1.0 usage in mind, since that is what I was learning back then, I would have to change quite a lot of things to allow for 1.2 features to be set, and I don't want to put that much work into a library I have decided to leave behind.
+- In the same line as the previous issue, there is an incorrect default value when creating command buffer pools that don't allow for individual command buffers to be reset. Due to the poor design of the library fixing this without changing the library is a bit annoying and I don't even remember how it was supposed to work now that I don't use it anymore (note to self: Make documentation for your libraries). Again, I don't want to change the library for the already mentioned reasons, so this error will not go away. I could have also just reset command pools instead of buffers but give me some slack, this code was made when I was still learning. 
+
+Validation layers appear for these issues, so in order to run in debug mode the breakpoint trigger has to be disabled. It's a second and everything works otherwise. Release build works perfectly fine without artifacts in both Nvidia and AMD so I am happy with the results. Hopefully you understand where I come from.
+
 ## Other
 
 This project was incredibly exciting to create but the resources were scarce and it was very hard to wrap my head around a lot of concepts. If anyone has any question on how anything works don't hesitate to open an issue asking.
